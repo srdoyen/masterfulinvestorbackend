@@ -19,17 +19,16 @@ promotionRouter
   })
   .post((req, res, next) => {
     Promotion.create(req.body)
-      .then((promotion) => {
-        console.log("Promotion Created ", promotion);
+      .then((partner) => {
         res.statusCode = 200;
         res.setHeader("Content-Type", "application/json");
-        res.json(promotion);
+        res.json(partner);
       })
       .catch((err) => next(err));
   })
   .put((req, res) => {
-    res.statusCode = 403;
-    res.end("PUT operation not supported on /promotions");
+    res.statusCode = 203;
+    res.end("PUT operation not supported on /partners");
   })
   .delete((req, res, next) => {
     Promotion.deleteMany()
