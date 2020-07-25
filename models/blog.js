@@ -28,7 +28,11 @@ const commentSchema = new Schema(
 
 const blogSchema = new Schema(
   {
-    name: {
+    blogId: {
+      type: Number,
+      required: true,
+    },
+    author: {
       type: String,
       required: true,
       unique: true,
