@@ -12,6 +12,7 @@ const authenticate = require("./authenticate");
 var indexRouter = require("./routes/index");
 var usersRouter = require("./routes/users");
 var campsiteRouter = require("./routes/campsiteRouter");
+var blogRouter = require("./routes/blogRouter");
 var partnerRouter = require("./routes/partnerRouter");
 var promotionRouter = require("./routes/promotionRouter");
 const uploadRouter = require("./routes/uploadRouter");
@@ -62,6 +63,7 @@ app.use(express.static(path.join(__dirname, "public")));
 
 app.use("/campsites", campsiteRouter);
 app.use("/promotions", promotionRouter);
+app.use("/blogs", blogRouter);
 app.use("/partners", partnerRouter);
 app.use("/imageUpload", uploadRouter);
 
