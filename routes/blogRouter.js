@@ -3,16 +3,16 @@ const bodyParser = require("body-parser");
 const Blog = require("../models/blog");
 const authenticate = require("../authenticate");
 const blogRouter = express.Router();
-
+const cors = require("./cors");
 const User = require("../models/user");
 
 blogRouter.use(bodyParser.json());
 
 blogRouter
   .route("/")
-  .get((req, res, next) => {
+  .options(cors.corsWithOptions, (req, res) => res.sendStatus(200))
+  .get(cors.cors, (req, res, next) => {
     Blog.find()
-      .populate("comments.author")
       .then((blogs) => {
         res.statusCode = 200;
         res.setHeader("Content-Type", "application/json");
@@ -20,21 +20,21 @@ blogRouter
       })
       .catch((err) => next(err));
   })
-  .post(authenticate.verifyUser, authenticate.verifyAdmin, (req, res, next) => {
+  .post(cors.corsWithOptions, (req, res, next) => {
     Blog.create(req.body)
       .then((blog) => {
-        console.log("Blog Created ", blog);
         res.statusCode = 200;
         res.setHeader("Content-Type", "application/json");
         res.json(blog);
       })
       .catch((err) => next(err));
   })
-  .put(authenticate.verifyUser, (req, res) => {
+  .put(cors.corsWithOptions, authenticate.verifyUser, (req, res) => {
     res.statusCode = 403;
     res.end("PUT operation not supported on /blogs");
   })
   .delete(
+    cors.corsWithOptions,
     authenticate.verifyUser,
     authenticate.verifyAdmin,
     (req, res, next) => {
@@ -50,7 +50,8 @@ blogRouter
 
 blogRouter
   .route("/:blogId")
-  .get((req, res, next) => {
+  .options(cors.corsWithOptions, (req, res) => res.sendStatus(200))
+  .get(cors.cors, (req, res, next) => {
     Blog.findById(req.params.blogId)
       .populate("comments.author")
       .then((blog) => {
@@ -60,26 +61,32 @@ blogRouter
       })
       .catch((err) => next(err));
   })
-  .post(authenticate.verifyUser, (req, res) => {
+  .post(cors.corsWithOptions, authenticate.verifyUser, (req, res) => {
     res.statusCode = 403;
     res.end(`POST operation not supported on /blogs/${req.params.blogId}`);
   })
-  .put(authenticate.verifyUser, authenticate.verifyAdmin, (req, res, next) => {
-    Blog.findByIdAndUpdate(
-      req.params.blogId,
-      {
-        $set: req.body,
-      },
-      { new: true }
-    )
-      .then((blog) => {
-        res.statusCode = 200;
-        res.setHeader("Content-Type", "application/json");
-        res.json(blog);
-      })
-      .catch((err) => next(err));
-  })
+  .put(
+    cors.corsWithOptions,
+    authenticate.verifyUser,
+    authenticate.verifyAdmin,
+    (req, res, next) => {
+      Blog.findByIdAndUpdate(
+        req.params.blogId,
+        {
+          $set: req.body,
+        },
+        { new: true }
+      )
+        .then((blog) => {
+          res.statusCode = 200;
+          res.setHeader("Content-Type", "application/json");
+          res.json(blog);
+        })
+        .catch((err) => next(err));
+    }
+  )
   .delete(
+    cors.corsWithOptions,
     authenticate.verifyUser,
     authenticate.verifyAdmin,
     (req, res, next) => {
@@ -95,7 +102,8 @@ blogRouter
 
 blogRouter
   .route("/:blogId/comments")
-  .get((req, res, next) => {
+  .options(cors.corsWithOptions, (req, res) => res.sendStatus(200))
+  .get(cors.cors, (req, res, next) => {
     Blog.findById(req.params.blogId)
       .populate("comments.author")
       .then((blog) => {
@@ -111,7 +119,7 @@ blogRouter
       })
       .catch((err) => next(err));
   })
-  .post(authenticate.verifyUser, (req, res, next) => {
+  .post(cors.corsWithOptions, authenticate.verifyUser, (req, res, next) => {
     Blog.findById(req.params.blogId)
       .then((blog) => {
         if (blog) {
@@ -133,13 +141,14 @@ blogRouter
       })
       .catch((err) => next(err));
   })
-  .put(authenticate.verifyUser, (req, res) => {
+  .put(cors.corsWithOptions, authenticate.verifyUser, (req, res) => {
     res.statusCode = 403;
     res.end(
       `PUT operation not supported on /blogs/${req.params.blogId}/comments`
     );
   })
   .delete(
+    cors.corsWithOptions,
     authenticate.verifyUser,
     authenticate.verifyAdmin,
     (req, res, next) => {
@@ -169,7 +178,8 @@ blogRouter
 
 blogRouter
   .route("/:blogId/comments/:commentId")
-  .get((req, res, next) => {
+  .options(cors.corsWithOptions, (req, res) => res.sendStatus(200))
+  .get(cors.cors, (req, res, next) => {
     Blog.findById(req.params.blogId)
       .populate("comments.author")
       .then((blog) => {
@@ -189,13 +199,13 @@ blogRouter
       })
       .catch((err) => next(err));
   })
-  .post(authenticate.verifyUser, (req, res) => {
+  .post(cors.corsWithOptions, authenticate.verifyUser, (req, res) => {
     res.statusCode = 403;
     res.end(
       `POST operation not supported on /blogs/${req.params.blogId}/comments/${req.params.commentId}`
     );
   })
-  .put(authenticate.verifyUser, (req, res, next) => {
+  .put(cors.corsWithOptions, authenticate.verifyUser, (req, res, next) => {
     Blog.findById(req.params.blogId)
       .then((blog) => {
         const thisComment = blog.comments.id(req.params.commentId);
@@ -232,7 +242,7 @@ blogRouter
       })
       .catch((err) => next(err));
   })
-  .delete(authenticate.verifyUser, (req, res, next) => {
+  .delete(cors.corsWithOptions, authenticate.verifyUser, (req, res, next) => {
     Blog.findById(req.params.blogId)
       .then((blog) => {
         const thisComment = blog.comments.id(req.params.commentId);
