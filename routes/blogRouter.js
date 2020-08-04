@@ -20,15 +20,20 @@ blogRouter
       })
       .catch((err) => next(err));
   })
-  .post(cors.corsWithOptions, (req, res, next) => {
-    Blog.create(req.body)
-      .then((blog) => {
-        res.statusCode = 200;
-        res.setHeader("Content-Type", "application/json");
-        res.json(blog);
-      })
-      .catch((err) => next(err));
-  })
+  .post(
+    cors.corsWithOptions,
+    authenticate.verifyUser,
+    authenticate.verifyAdmin,
+    (req, res, next) => {
+      Blog.create(req.body)
+        .then((blog) => {
+          res.statusCode = 200;
+          res.setHeader("Content-Type", "application/json");
+          res.json(blog);
+        })
+        .catch((err) => next(err));
+    }
+  )
   .put(cors.corsWithOptions, authenticate.verifyUser, (req, res) => {
     res.statusCode = 403;
     res.end("PUT operation not supported on /blogs");
@@ -119,12 +124,15 @@ blogRouter
       })
       .catch((err) => next(err));
   })
-  .post(cors.corsWithOptions, authenticate.verifyUser, (req, res, next) => {
-    Blog.findById(req.params.blogId)
+  .post(cors.corsWithOptions, (req, res, next) => {
+    Blog.findById(req.body.blogId)
       .then((blog) => {
         if (blog) {
-          req.body.author = req.user._id;
-          blog.comments.push(req.body);
+          blog.comments.push({
+            name: req.body.name,
+            email: req.body.email,
+            comment: req.body.comment,
+          });
           blog
             .save()
             .then((blog) => {

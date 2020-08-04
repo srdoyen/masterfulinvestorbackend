@@ -60,6 +60,17 @@ app.use("/", indexRouter);
 app.use("/users", usersRouter);
 app.use(express.static(path.join(__dirname, "public")));
 
+//app access control allow origin
+// app.all("/*", function (req, res, next) {
+//   res.header("Access-Control-Allow-Origin", "http://localhost:3001");
+//   res.header(
+//     "Access-Control-Allow-Methods: GET, POST, PATCH, PUT, DELETE, OPTIONS"
+//   );
+//   res.header(
+//     "Access-Control-Allow-Headers: Origin, Content-Type, X-Auth-Token"
+//   );
+//   next();
+// });
 
 app.use("/blogs", blogRouter);
 app.use("/imageUpload", uploadRouter);

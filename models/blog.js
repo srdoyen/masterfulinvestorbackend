@@ -1,27 +1,25 @@
 const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
-/*
+
 const commentSchema = new Schema(
   {
-    rating: {
-      type: Number,
-      min: 1,
-      max: 5,
-      required: true,
-    },
-    text: {
+    name: {
       type: String,
       required: true,
     },
-    author: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "User",
+    email: {
+      type: String,
+      required: true,
+    },
+    comment: {
+      type: String,
+      required: true,
     },
   },
   {
     timestamps: true,
   }
-);*/
+);
 
 const blogSchema = new Schema(
   {
@@ -41,7 +39,8 @@ const blogSchema = new Schema(
     description: {
       type: String,
       required: true,
-    }
+    },
+    comments: [commentSchema],
   },
   {
     timestamps: true,
